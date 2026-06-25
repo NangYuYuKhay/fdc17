@@ -6,5 +6,7 @@ use Illuminate\Http\Request;
 
 class FeatureBController
 {
-    //
+    function getUserName(){
+        //first edited function
+    }
 }
