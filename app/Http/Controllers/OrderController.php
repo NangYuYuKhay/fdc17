@@ -8,6 +8,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class OrderController
 {
@@ -106,8 +107,65 @@ class OrderController
      */
     public function update(Request $request, Order $order)
     {
-        
+        // $data = [];
+        // $data['order_date'] = $request->order_date;
+        // $data['total_price'] = $request->total_price;
+        // $data['updated_at'] = Carbon::now();
+    
+        // $order->update($data);
+    
+        // OrderItem::where('order_id', $order->id)->delete();
+    
+        // $items = json_decode($request->items);
+    
+        // foreach ($items as $item) {
+        //     OrderItem::insert([
+        //         'order_id'  => $order->id,
+        //         'item_id'   => $item->id,
+        //         'price'     => $item->price,
+        //         'qty'       => $item->qty,
+        //         'sub_total' => $item->sub_total,
+        //     ]);
+        // }
+    
+        // return response()->json('Your order is updated.', 200);
+
+        $request->validate([
+            'order_date' => 'required|date',
+            'total_price' => 'required|numeric',
+            'items' => 'required',
+        ]);
+
+        DB::transaction(function () use ($request, $order) {
+
+            $items = json_decode($request->items);
+
+            $order->update([
+                'order_date' => $request->order_date,
+                'total_price' => $request->total_price,
+            ]);
+
+            OrderItem::where('order_id', $order->id)->delete();
+
+            foreach ($items as $item) {
+
+                OrderItem::create([
+                    'order_id'  => $order->id,
+                    'item_id'   => $item->id,
+                    'price'     => $item->price,
+                    'qty'       => $item->qty,
+                    'sub_total' => $item->sub_total,
+                ]);
+            }
+        });
+
+        // return response()->json([
+        //     'message' => 'Order updated successfully.'
+        // ], 200);
+        return response()->json('Your order is updated.',200);
+
     }
+
 
     /**
      * Remove the specified resource from storage.

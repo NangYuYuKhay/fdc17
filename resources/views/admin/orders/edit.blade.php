@@ -60,7 +60,7 @@
             <div class="mb-3">
                 <button class="btn btn-primary" id="btn-order">
                 <i class="fa-solid fa-cart-arrow-down"></i>
-                    Place order
+                    Update order
                 </button>
             </div>
         </div>
@@ -90,10 +90,11 @@
             const items = JSON.stringify(selectedItems)
 
             $.ajax({
-                url : "/admin/orders",
+                url : "/admin/orders/{{ $order->id }}",
                 type : "POST" ,
                 data :{
                     "_token" : "{{ csrf_token() }}",
+                    "_method" : "PUT" ,
                     "order_date" : order_date,
                     "total_price" : total_price,
                     "items" :items,
